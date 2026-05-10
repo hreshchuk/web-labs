@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Лабораторна робота №1</title>
+</head>
+<body>
+  <h2>Лабораторна робота №1</h2>
+  <p>Відкрийте консоль браузера (F12 → Console) та викличте функцію <code>triangle()</code>.</p>
+
+  <script>
+
+    // Допоміжні функції
+    const toRad = deg => deg * Math.PI / 180;
+    const toDeg = rad => rad * 180 / Math.PI;
+
+    function printResult(a, b, c, alpha, beta) {
+      console.log(`a = ${a}`);
+      console.log(`b = ${b}`);
+      console.log(`c = ${c}`);
+      console.log(`alpha = ${alpha}`);
+      console.log(`beta = ${beta}`);
+    }
+
+    // Перевірка коректності
+    function validateTriangle(a, b, c, alpha, beta) {
+      if (a <= 0 || b <= 0 || c <= 0)
+        return "Error: sides must be positive";
+      if (alpha <= 0 || beta <= 0 || alpha >= 90 || beta >= 90)
+        return "Error: angles must be between 0° and 90° (exclusive)";
+      if (a >= c || b >= c)
+        return "Error: leg must be shorter than hypotenuse";
+      return null;
+    }
+
+    // Головна функція
+    function triangle(val1, type1 = "leg", val2, type2 = "hypotenuse") {
+
+      // Перевірка на від'ємні/нульові значення одразу
+      if (val1 <= 0 || val2 <= 0) return "Zero or negative input";
+
+      const VALID_TYPES = ["leg", "hypotenuse", "adjacent angle", "opposite angle", "angle"];
+      if (!VALID_TYPES.includes(type1) || !VALID_TYPES.includes(type2)) {
+        console.log("Будь ласка, перечитайте інструкцію — вказано невірний тип елемента.");
+        return "failed";
+      }
+
+      // Нормалізуємо пару: сортуємо щоб спростити логіку
+      // Зберігаємо як об'єкти {val, type}
+      let e1 = { val: val1, type: type1 };
+      let e2 = { val: val2, type: type2 };
+
+      let a, b, c, alpha, beta;
+
+      const types = [e1.type, e2.type].sort().join("|");
+
+      // Функція пошуку елемента за типом
+      const get = (t) => [e1, e2].find(e => e.type === t)?.val;
+
+      // Всі можливі комбінації
+
+      // 1. два катети
+      if (e1.type === "leg" && e2.type === "leg") {
+        a = e1.val; b = e2.val;
+        c = Math.sqrt(a**2 + b**2);
+        alpha = toDeg(Math.atan(a / b));
+        beta  = toDeg(Math.atan(b / a));
+      }
+
+      // 2. катет + гіпотенуза
+      else if ([e1.type, e2.type].includes("leg") && [e1.type, e2.type].includes("hypotenuse")) {
+        a = get("leg"); c = get("hypotenuse");
+        if (a >= c) return "Error: leg must be shorter than hypotenuse";
+        b = Math.sqrt(c**2 - a**2);
+        alpha = toDeg(Math.asin(a / c));
+        beta  = toDeg(Math.asin(b / c));
+      }
+
+      // 3. катет + прилеглий кут
+      else if ([e1.type, e2.type].includes("leg") && [e1.type, e2.type].includes("adjacent angle")) {
+        a = get("leg"); beta = get("adjacent angle");
+        if (beta <= 0 || beta >= 90) return "Error: angle must be between 0° and 90°";
+        alpha = 90 - beta;
+        b = a / Math.tan(toRad(alpha));
+        c = a / Math.sin(toRad(alpha));
+      }
+
+      // 4. катет + протилежний кут
+      else if ([e1.type, e2.type].includes("leg") && [e1.type, e2.type].includes("opposite angle")) {
+        a = get("leg"); alpha = get("opposite angle");
+        if (alpha <= 0 || alpha >= 90) return "Error: angle must be between 0° and 90°";
+        beta = 90 - alpha;
+        b = a / Math.tan(toRad(alpha));
+        c = a / Math.sin(toRad(alpha));
+      }
+
+      // 5. гіпотенуза + кут (angle)
+      else if ([e1.type, e2.type].includes("hypotenuse") && [e1.type, e2.type].includes("angle")) {
+        c = get("hypotenuse"); alpha = get("angle");
+        if (alpha <= 0 || alpha >= 90) return "Error: angle must be between 0° and 90°";
+        beta = 90 - alpha;
+        a = c * Math.sin(toRad(alpha));
+        b = c * Math.sin(toRad(beta));
+      }
+
+      // 6. гіпотенуза + прилеглий кут
+      else if ([e1.type, e2.type].includes("hypotenuse") && [e1.type, e2.type].includes("adjacent angle")) {
+        c = get("hypotenuse"); beta = get("adjacent angle");
+        if (beta <= 0 || beta >= 90) return "Error: angle must be between 0° and 90°";
+        alpha = 90 - beta;
+        a = c * Math.sin(toRad(alpha));
+        b = c * Math.sin(toRad(beta));
+      }
+
+      // 7. гіпотенуза + протилежний кут
+      else if ([e1.type, e2.type].includes("hypotenuse") && [e1.type, e2.type].includes("opposite angle")) {
+        c = get("hypotenuse"); alpha = get("opposite angle");
+        if (alpha <= 0 || alpha >= 90) return "Error: angle must be between 0° and 90°";
+        beta = 90 - alpha;
+        a = c * Math.sin(toRad(alpha));
+        b = c * Math.sin(toRad(beta));
+      }
+
+      // Несумісна пара
+      else {
+        console.log("Будь ласка, перечитайте інструкцію — несумісна пара типів.");
+        return "failed";
+      }
+
+      // Фінальна валідація
+      const err = validateTriangle(a, b, c, alpha, beta);
+      if (err) return err;
+
+      printResult(a, b, c, alpha, beta);
+      return "success";
+    }
+  </script>
+</body>
+</html>
