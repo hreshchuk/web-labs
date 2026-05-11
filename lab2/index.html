@@ -16,7 +16,7 @@
     car1.color = "red";
     car1.maxSpeed = 200;
     car1.driver = new Object();
-    car1.driver.name = "Greshchuk Maksym"; // ← заміни на своє ім'я
+    car1.driver.name = "Greshchuk Maksym";
     car1.driver.category = "C";
     car1.driver["personal limitations"] = "No driving at night";
     car1.tuning = true;
@@ -31,7 +31,7 @@
       color: "blue",
       maxSpeed: 180,
       driver: {
-        name: "Greshchuk Maksym", // ← заміни на своє ім'я
+        name: "Greshchuk Maksym",
         category: "B",
         "personal limitations": null
       },
@@ -101,8 +101,8 @@
     var truck1 = new Truck("green", 5000, 90.5, "Volvo", "FH16");
     var truck2 = new Truck("black", 8000, 80.0, "MAN",   "TGX");
 
-    truck1.AssignDriver("Greshchuk Maksym", true,  10); // ← заміни на своє ім'я
-    truck2.AssignDriver("Greshchuk Maksym", false,  5); // ← заміни на своє ім'я
+    truck1.AssignDriver("Greshchuk Maksym", true,  10);
+    truck2.AssignDriver("Greshchuk Maksym", false,  5);
 
     console.log("=== truck1.trip() ===");
     truck1.trip();
